@@ -12,45 +12,67 @@ canvas.width = 700;
 canvas.height = 400;
 
 
-// undo/redo funkcije
+const initialData = copyImageData(ctx.createImageData(canvas.width, canvas.height));
+let lastSave = copyImageData(ctx.getImageData(0, 0, canvas.width, canvas.height));
+
+
+const bufferSize = 10; // max undoBuffer size
 const undoBuffer = [];
 const redoBuffer = [];
-var undoBufferIndex = -1;
-var redoBufferIndex = -1;
 
 
-function saveToBuffer() {
-    console.log("Saving to buffer...");
-    const canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    undoBuffer.push(canvasData);
-    undoBufferIndex++;
-    // Clear the redo buffer
-    redoBuffer.length = 0;
-    redoBufferIndex = -1;
-    console.log(undoBuffer);
-    console.log(undoBufferIndex);
+function getLastSave() {
+    return new ImageData(
+        new Uint8ClampedArray(lastSave.data),
+        lastSave.width,
+        lastSave.height
+    );
 }
 
-function undo() {
-    if(undoBufferIndex > 0) {
-        redoBuffer.push(undoBuffer.pop());
-        undoBufferIndex--;
-        ctx.width = undoBuffer[undoBufferIndex].width;
-        ctx.height = undoBuffer[undoBufferIndex].height;
-        ctx.clearRect(0, 0, ctx.width, ctx.height); // Clear the canvas
-        ctx.putImageData(undoBuffer[undoBufferIndex], 0, 0);
+function setLastSave(imageData) {
+    lastSave = new ImageData(
+        new Uint8ClampedArray(imageData.data),
+        imageData.width,
+        imageData.height
+    );
+
+    undoBuffer.push(copyImageData(lastSave));
+    redoBuffer.length = 0; // clear redoBuffer
+
+    if(undoBuffer.length > bufferSize + 1) {
+        undoBuffer.shift();
     }
+
+    //console.log(`image saved. undoBuffer length: ${undoBuffer.length}`);
+}
+setLastSave(initialData);
+
+function undo() {
+    if(undoBuffer.length > 1) {
+        redoBuffer.push(undoBuffer.pop());
+        lastImageData = undoBuffer[undoBuffer.length - 1] || initialData;
+        if(lastImageData.width !== canvas.width || lastImageData.height !== canvas.height) {
+            // resize canvas
+            canvas.width = lastImageData.width;
+            canvas.height = lastImageData.height;
+        }
+        ctx.putImageData(lastImageData, 0, 0);
+        lastSave = lastImageData;
+    }
+    //console.log(`undo. undoBuffer length: ${undoBuffer.length}`);
 }
 
 function redo() {
-    if(redoBufferIndex >= 0) {
+    if(redoBuffer.length > 0) {
         undoBuffer.push(redoBuffer.pop());
-        undoBufferIndex++;
-        ctx.width = undoBuffer[undoBufferIndex].width;
-        ctx.height = undoBuffer[undoBufferIndex].height;
-        ctx.clearRect(0, 0, ctx.width, ctx.height); // Clear the canvas
-        ctx.putImageData(undoBuffer[undoBufferIndex], 0, 0);
+        lastImageData = undoBuffer[undoBuffer.length - 1];
+        if(lastImageData.width !== canvas.width || lastImageData.height !== canvas.height) {
+            // resize canvas
+            canvas.width = lastImageData.width;
+            canvas.height = lastImageData.height;
+        }
+        ctx.putImageData(lastImageData, 0, 0);
+        lastSave = lastImageData;
     }
+    //console.log(`redo. redoBuffer length: ${redoBuffer.length}`);
 }
-
-saveToBuffer(); // save the image to the undo buffer

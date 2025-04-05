@@ -13,6 +13,7 @@ canvas.addEventListener("mousedown", () => {
 
 canvas.addEventListener("mouseup", () => {
     drawing = false;
+    setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
 });
 
 canvas.addEventListener("mousemove", (event) => {
@@ -26,6 +27,3 @@ canvas.addEventListener("mousemove", (event) => {
     ctx.fill();
     ctx.closePath();
 });
-
-
-

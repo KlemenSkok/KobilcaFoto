@@ -17,7 +17,9 @@ function uploadImage(e) {
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-            
+
+            setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
+
             //saveToBuffer(); // save the image to the undo buffer
             //console.log("Image uploaded.");
         }
@@ -32,30 +34,47 @@ function uploadImage(e) {
 
 // grayscale filter
 document.getElementById("grayscale-btn").addEventListener("click", () => {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const imageData = getLastSave();
     const newImageData = grayscale(imageData);
     ctx.putImageData(newImageData, 0, 0);
     
     // save the image
+    setLastSave(newImageData);
+});
+
+document.getElementById("invert-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = invert(imageData);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+    canvas.width = initialData.width;
+    canvas.height = initialData.height;
+    ctx.putImageData(initialData, 0, 0);
+
+    setLastSave(initialData);
 });
 
 // brightness filter
 document.getElementById("brightness-slider").addEventListener("mouseup", (event) =>{
     // apply the filter
-    let value = 1 + event.target.value / 100;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let value = event.target.value / 2;
+    const imageData = getLastSave();
     const newImageData = brightness(imageData, value);
     ctx.putImageData(newImageData, 0, 0);
     
     // AND save the image
+    setLastSave(newImageData);
 });
 
 document.getElementById("brightness-slider").addEventListener("input", (event) => {
     // apply the filter
-    let value = 1 + event.target.value / 100;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let value = event.target.value * 0.75;
+    const imageData = getLastSave();
     const newImageData = brightness(imageData, value);
     ctx.putImageData(newImageData, 0, 0);
 });
@@ -63,31 +82,40 @@ document.getElementById("brightness-slider").addEventListener("input", (event) =
 
 // tresholding filter
 document.getElementById("tresholding-slider").addEventListener("mouseup", (event) =>{
-    console.log(event.target.value);
     // apply the filter
     let value = event.target.value;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const imageData = getLastSave();
     const newImageData = tresholding(imageData, value);
     ctx.putImageData(newImageData, 0, 0);
     
     // AND save the image
+    setLastSave(newImageData);
 });
 
 
 document.getElementById("tresholding-slider").addEventListener("input", (event) => {
     // apply the filter
     let value = event.target.value;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const imageData = getLastSave();
     const newImageData = tresholding(imageData, value);
     ctx.putImageData(newImageData, 0, 0);
 });
 
 
+// download button
+document.getElementById("download-btn").addEventListener("click", () => {
+    const link = document.createElement('a');
+    link.download = 'image.png';
+    link.href = canvas.toDataURL();
+    link.click();
+});
+
+
 // undo/redo buttons
 document.getElementById("undo-btn").addEventListener("click", () => {
-    //undo();
+    undo();
 });
 
 document.getElementById("redo-btn").addEventListener("click", () => {
-    //redo();
+    redo();
 });
