@@ -101,6 +101,27 @@ document.getElementById("laplace-edge-btn").addEventListener("click", () => {
     setLastSave(newImageData);
 });
 
+// sharpening filter
+document.getElementById("sharpen-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = sharpen(imageData);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+// unsharpen filter
+document.getElementById("unsharpen-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = unsharpMask(imageData, 2, 1.2);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+
 
 // brightness filter
 document.getElementById("brightness-slider").addEventListener("mouseup", (event) =>{
@@ -152,6 +173,93 @@ document.getElementById("download-btn").addEventListener("click", () => {
     link.href = canvas.toDataURL();
     link.click();
 });
+
+
+// color channel manipulation
+// R
+document.getElementById("r-channel-slider").addEventListener("mouseup", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, r = value);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+});
+document.getElementById("r-channel-slider").addEventListener("input", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, r = value);
+    ctx.putImageData(newImageData, 0, 0);
+});
+document.getElementById("r-channel-btn").addEventListener("click", () => {
+    // apply the filter
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, r = 0);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+})
+
+// G
+document.getElementById("g-channel-slider").addEventListener("mouseup", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, g = value);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+});
+document.getElementById("g-channel-slider").addEventListener("input", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, g = value);
+    ctx.putImageData(newImageData, 0, 0);
+});
+document.getElementById("g-channel-btn").addEventListener("click", () => {
+    // apply the filter
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, g = 0);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+})
+
+// B
+document.getElementById("b-channel-slider").addEventListener("mouseup", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, b = value);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+});
+document.getElementById("b-channel-slider").addEventListener("input", (event) => {
+    // apply the filter
+    let value = event.target.value;
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, b = value);
+    ctx.putImageData(newImageData, 0, 0);
+});
+document.getElementById("b-channel-btn").addEventListener("click", () => {
+    // apply the filter
+    const imageData = getLastSave();
+    const newImageData = alterColorChannels(imageData, b = 0);
+    ctx.putImageData(newImageData, 0, 0);
+
+    // AND save the image
+    setLastSave(newImageData);
+})
+
 
 
 // undo/redo buttons

@@ -6,13 +6,13 @@
 ### Osnovne zahteve
 - [x] sivinska slika (grayscale)
 - [x] pragovna filtracija (tresholding)
-- [x] odstranjevanje posameznih barvnih kanalov
+- [ ] odstranjevanje posameznih barvnih kanalov
 - [ ] poudarjanje posameznega barvnega kanala
 - [x] spreminjanje svetlosti slike
 - [x] konvolucijo s škatlastim (box blur) in gladkim (gaussian blur) jedrom
 - [x] iskanje robov s Sobelovim operatorjem
 - [x] iskanje robov s Laplaceovim operatorjem
-- [ ] konvolucijo z ostrenjem in neostrenjem (sharpening and unsharpening mask)
+- [x] konvolucijo z ostrenjem in neostrenjem (sharpening and unsharpening mask)
 - [ ] histogram intenzitet kanalov
 
 ### Dodatne zahteve
