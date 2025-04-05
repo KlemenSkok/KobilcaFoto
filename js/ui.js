@@ -42,6 +42,7 @@ document.getElementById("grayscale-btn").addEventListener("click", () => {
     setLastSave(newImageData);
 });
 
+// invert image filter
 document.getElementById("invert-btn").addEventListener("click", () => {
     const imageData = getLastSave();
     const newImageData = invert(imageData);
@@ -51,6 +52,7 @@ document.getElementById("invert-btn").addEventListener("click", () => {
     setLastSave(newImageData);
 });
 
+// reset canvas to initial state
 document.getElementById("reset-btn").addEventListener("click", () => {
     canvas.width = initialData.width;
     canvas.height = initialData.height;
@@ -58,6 +60,47 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 
     setLastSave(initialData);
 });
+
+// box blur filter
+document.getElementById("boxblur-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = boxBlur(imageData, 20);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+// gaussian blur filter
+document.getElementById("gaussianblur-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = gaussianBlur(imageData);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+// sobel filter
+document.getElementById("sobel-edge-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = sobelEdgeDetection(imageData);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
+// laplacian filter
+document.getElementById("laplace-edge-btn").addEventListener("click", () => {
+    const imageData = getLastSave();
+    const newImageData = laplaceEdgeDetection(imageData);
+    ctx.putImageData(newImageData, 0, 0);
+    
+    // save the image
+    setLastSave(newImageData);
+});
+
 
 // brightness filter
 document.getElementById("brightness-slider").addEventListener("mouseup", (event) =>{
