@@ -15,9 +15,9 @@ function grayscale(imageData) {
 function brightness(imageData, value) {
     const data = imageData.data;
     for(let i = 0; i < data.length; i += 4) {
-        data[i] = data[i] + value;     // Red
-        data[i + 1] = data[i + 1] + value; // Green
-        data[i + 2] = data[i + 2] + value; // Blue
+        data[i] = data[i] + value;          // Red
+        data[i + 1] = data[i + 1] + value;  // Green
+        data[i + 2] = data[i + 2] + value;  // Blue
     }
     return imageData;
 }

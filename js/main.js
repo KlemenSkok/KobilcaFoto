@@ -8,6 +8,9 @@ const image = new Image();
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
+canvas.width = 700;
+canvas.height = 400;
+
 
 // undo/redo funkcije
 const undoBuffer = [];
