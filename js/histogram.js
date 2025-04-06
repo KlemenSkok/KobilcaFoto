@@ -24,7 +24,7 @@ const graph = new Chart("histogram", {
         },
         plugins: {
             customCanvasBackgroundColor: {
-                color: "#fff"
+                color: "#f5f5f5"
             }
         }
     },

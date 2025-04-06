@@ -113,7 +113,66 @@ body {
     right: 0;
     width: 400px;
     padding: 20px;
-    background-color: #353535;
+    background-color: #f5f5f5;
     border: 1px solid #666;
     border-radius: 5px;
+}
+
+#settings-container {
+    height: 94vh;
+    background-color: #353535;
+    border-left: 1px solid #555;
+    overflow-y: auto;
+    color: white;
+    z-index: 2; /* above the histogram */
+}
+
+#settings-close-btn {
+    color: #353535; 
+    font-size: 20px; 
+    background-color: rgb(255, 118, 118);
+    user-select: none;
+    cursor: pointer;
+    
+    &:hover {
+        background-color: rgb(255, 96, 96);
+    }
+}
+
+.settings-panel {
+    padding: 15px 5px;
+}
+
+.settings-panel > hr {
+    border: 1px solid #555;
+    margin: 10px 0;
+}
+
+.settings-panel > div:first-child > span {
+    user-select: none;
+
+    & > span {
+        font-size: 15px;
+    }
+}
+
+.settings-panel > div:nth-child(3) {
+    padding: 10px 5px;
+
+    & button {
+        background-color: #555;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        height: 100%;
+        user-select: none;
+        padding: 2px 5px;
+        margin: 2px 0;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: #444;
+        }
+    }
 }

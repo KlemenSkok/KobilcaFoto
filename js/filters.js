@@ -331,6 +331,6 @@ function alterColorChannels(data, r = 1, g = 1, b = 1) {
         pixels[i + 2] = clamp_Uint8(pixels[i + 2] * b); // Blue
     }
 
-    console.log(`r: ${r}, g: ${g}, b: ${b}`);
+    //console.log(`r: ${r}, g: ${g}, b: ${b}`);
     return data;
 }

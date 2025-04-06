@@ -1,4 +1,15 @@
 
+
+
+
+
+
+let settingsPanelOpen = false;
+
+
+
+
+
 // UPLOAD IMAGES
 
 document.getElementById("upload-btn").addEventListener("click", () => {
@@ -285,4 +296,127 @@ document.getElementById("redo-btn").addEventListener("click", () => {
 // show or hide the histogram
 document.getElementById("toggle-histogram-btn").addEventListener("click", () => {
     document.getElementById("histogram-container").classList.toggle("hidden");
+});
+
+
+// open and close different setting panels
+
+// main settings close button
+document.getElementById("settings-close-btn").addEventListener("click", () => {
+    // hide the container
+    document.getElementById("main-container").style.gridTemplateColumns = "20% 80%";
+
+    document.getElementById("settings-container").classList.add("hidden");
+    settingsPanelOpen = false;
+
+});
+
+// open filters panel
+document.getElementById("filters-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "filters-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("filters-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
+});
+
+// open blurring panel
+document.getElementById("blurring-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "blurring-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("blurring-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
+});
+
+// open edge detection panel
+document.getElementById("edge-detection-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "edge-detection-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("edge-detection-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
+});
+
+// open color channels panel
+document.getElementById("color-channel-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "color-channels-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("color-channels-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
+});
+
+// open brightness panel
+document.getElementById("sharpening-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "sharpening-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("sharpening-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
 });
