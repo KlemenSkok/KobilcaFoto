@@ -2,9 +2,26 @@
 
 
 
-
+let currentMode = "none";
 
 let settingsPanelOpen = false;
+
+// drawing vars
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let currentBrushColor = "#000000";
+let currentBrushSize = 5;
+
+// selection vars
+let isSelecting = false;
+let selectionStartX = 0;
+let selectionStartY = 0;
+let selectionBox = null;
+
+ctx.lineWidth = currentBrushSize;
+ctx.lineCap = "round";
+ctx.strokeStyle = currentBrushColor;
 
 
 
@@ -49,6 +66,17 @@ function updateColorChannels() {
 
     const newImageData = alterColorChannels(getLastSave(), r_channel, g_channel, b_channel);
     ctx.putImageData(newImageData, 0, 0);
+}
+
+function drawSelectionBox() {
+    if(selectionBox) {
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(selectionBox.x, selectionBox.y, selectionBox.width, selectionBox.height);
+        
+        ctx.strokeStyle = currentBrushColor;
+        ctx.lineWidth = currentBrushSize;
+    }
 }
 
 
@@ -312,6 +340,28 @@ document.getElementById("settings-close-btn").addEventListener("click", () => {
 });
 
 // open filters panel
+document.getElementById("drawing-panel-btn").addEventListener("click", () => {
+    // change grid css settings
+    if(!settingsPanelOpen) {
+        // open the panel if not yet open
+        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
+    }
+    document.getElementById("settings-container").classList.remove("hidden");
+
+    // close all other panels
+    for(const panel of document.querySelectorAll(".settings-panel")){
+        if(panel.id !== "drawing-panel") {
+            panel.classList.add("hidden");
+        }
+    }
+
+    // open the blurring panel
+    document.getElementById("drawing-panel").classList.remove("hidden");
+    
+    settingsPanelOpen = true;
+});
+
+// open filters panel
 document.getElementById("filters-panel-btn").addEventListener("click", () => {
     // change grid css settings
     if(!settingsPanelOpen) {
@@ -329,28 +379,6 @@ document.getElementById("filters-panel-btn").addEventListener("click", () => {
 
     // open the blurring panel
     document.getElementById("filters-panel").classList.remove("hidden");
-    
-    settingsPanelOpen = true;
-});
-
-// open blurring panel
-document.getElementById("blurring-panel-btn").addEventListener("click", () => {
-    // change grid css settings
-    if(!settingsPanelOpen) {
-        // open the panel if not yet open
-        document.getElementById("main-container").style.gridTemplateColumns = "20% 60% 20%";
-    }
-    document.getElementById("settings-container").classList.remove("hidden");
-
-    // close all other panels
-    for(const panel of document.querySelectorAll(".settings-panel")){
-        if(panel.id !== "blurring-panel") {
-            panel.classList.add("hidden");
-        }
-    }
-
-    // open the blurring panel
-    document.getElementById("blurring-panel").classList.remove("hidden");
     
     settingsPanelOpen = true;
 });
@@ -419,4 +447,121 @@ document.getElementById("sharpening-panel-btn").addEventListener("click", () => 
     document.getElementById("sharpening-panel").classList.remove("hidden");
     
     settingsPanelOpen = true;
+});
+
+
+
+
+// drawing panel inputs
+
+document.getElementById("drawing-color-input").addEventListener("input", (event) => {
+    currentBrushColor = event.target.value;
+    ctx.strokeStyle = currentBrushColor;
+});
+
+document.getElementById("drawing-size-input").addEventListener("input", (event) => {
+    currentBrushSize = event.target.value;
+    ctx.lineWidth = currentBrushSize;
+});
+
+
+// actual drawing
+
+canvas.addEventListener("mousedown", (event) => {
+    if (currentMode === "drawing") {
+        
+        isDrawing = true;
+        
+        const rect = canvas.getBoundingClientRect();
+        lastX = event.clientX - rect.left;
+        lastY = event.clientY - rect.top;
+        
+        // instanty draw a circle at the mouse position
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, currentBrushSize/2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+    }
+    else if(currentMode === "box-selection") {
+        isSelecting = true;
+
+        const rect = canvas.getBoundingClientRect();
+        selectionStartX = event.clientX - rect.left;
+        selectionStartY = event.clientY - rect.top;
+    }
+});
+
+canvas.addEventListener("mouseup", (event) => {
+    if(isDrawing) {
+        isDrawing = false;
+        setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+    else if(isSelecting) {
+        isSelecting = false;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        selectionBox = {
+            x: Math.min(selectionStartX, x),
+            y: Math.min(selectionStartY, y),
+            width: Math.abs(selectionStartX - x),
+            height: Math.abs(selectionStartY - y)
+        };
+
+        if(selectionBox.width == 0 || selectionBox.height == 0) {
+            // enable cancelling the selection
+            selectionBox = null;
+        }
+    }
+});
+
+canvas.addEventListener("mouseleave", () => {
+    if(!isDrawing) 
+        return;
+
+    isDrawing = false;
+    setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
+});
+
+canvas.addEventListener("mousemove", (event) => {
+    if (isDrawing) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        
+        lastX = x;
+        lastY = y;
+    }
+    else if(isSelecting) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        selectionBox = {
+            x: Math.min(selectionStartX, x),
+            y: Math.min(selectionStartY, y),
+            width: Math.abs(selectionStartX - x),
+            height: Math.abs(selectionStartY - y)
+        };
+
+        // draw the thing
+
+    }
+});
+
+
+// select current mode (what mouse does)
+document.getElementById("mode-selection").addEventListener("input", (event) => {
+    currentMode = event.target.value;
+
+    // reset selection
+    selectionBox = null;
+    isSelecting = false;
 });
