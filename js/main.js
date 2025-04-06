@@ -43,6 +43,8 @@ function setLastSave(imageData) {
         undoBuffer.shift();
     }
 
+    updateHistogram(lastSave);
+
     //console.log(`image saved. undoBuffer length: ${undoBuffer.length}`);
 }
 setLastSave(initialData);
@@ -58,6 +60,8 @@ function undo() {
         }
         ctx.putImageData(lastImageData, 0, 0);
         lastSave = lastImageData;
+
+        updateHistogram(lastSave);
     }
     //console.log(`undo. undoBuffer length: ${undoBuffer.length}`);
 }
@@ -73,6 +77,8 @@ function redo() {
         }
         ctx.putImageData(lastImageData, 0, 0);
         lastSave = lastImageData;
+
+        updateHistogram(lastSave);
     }
     //console.log(`redo. redoBuffer length: ${redoBuffer.length}`);
 }

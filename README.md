@@ -13,7 +13,7 @@
 - [x] iskanje robov s Sobelovim operatorjem
 - [x] iskanje robov s Laplaceovim operatorjem
 - [x] konvolucijo z ostrenjem in neostrenjem (sharpening and unsharpening mask)
-- [ ] histogram intenzitet kanalov
+- [x] histogram intenzitet kanalov
 
 ### Dodatne zahteve
 - [x] undo/redo

@@ -6,74 +6,82 @@
     <title>Kobilca</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=redo,undo" />
+
+    <script src="js/external/chart.min.js"></script>
 </head>
 <body>
 
-        <div id="navbar">
-            <div>
-                <button id="upload-btn">Upload Image</button>
-                    <input type="file" id="actual-upload-btn" value="Upload Image" style="display: none;" />
-                <button id="download-btn">Download Image</button>
-            </div>
-            <div class="title">Kobilca - online fotošop</div>
-            <div></div>
+    <div id="navbar">
+        <div>
+            <button id="upload-btn">Upload Image</button>
+                <input type="file" id="actual-upload-btn" value="Upload Image" style="display: none;" />
+            <button id="download-btn">Download Image</button>
         </div>
-        <div id="main-container">
-            <div id="toolbar">
+        <div class="title">Kobilca - online fotošop</div>
+        <div></div>
+    </div>
+    <div id="main-container">
+        <div id="toolbar">
+            <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
+                <button id="undo-btn" class="material-symbols-outlined">undo</button>
+                <button id="redo-btn" class="material-symbols-outlined">redo</button>
+            </div>
+            <button id="reset-btn">Reset</button>
+            <button id="invert-btn">Invert</button>
+            <button id="grayscale-btn">Grayscale</button>
+            <button id="boxblur-btn">Box blur</button>
+            <button id="gaussianblur-btn">Gaussian blur</button>
+            <button id="sobel-edge-btn">Sobel edge detection</button>
+            <button id="laplace-edge-btn">Laplace edge detection</button>
+            
+            <button id="sharpen-btn">Sharpen</button>
+            <button id="unsharpen-btn">Unsharpen</button>
+
+            <hr>
+            <label>Color channels</label>
+            <div id="color-channels">
+                <div>
+                    <label for="r-channel-slider">R</label>
+                    <input type="range" name="r-channel-slider" id="r-channel-slider" min="0" max="2" value="1" step="0.1">
+                    <input type="checkbox" name="r-channel-btn" id="r-channel-btn" checked="checked">
+                </div>
+                <div>
+                    <label for="g-channel-slider">G</label>
+                    <input type="range" name="g-channel-slider" id="g-channel-slider" min="0" max="2" value="1" step="0.1">
+                    <input type="checkbox" name="g-channel-btn" id="g-channel-btn" checked="checked">
+                </div>
+                <div>
+                    <label for="b-channel-slider">B</label>
+                    <input type="range" name="b-channel-slider" id="b-channel-slider" min="0" max="2" value="1" step="0.1">
+                    <input type="checkbox" name="b-channel-btn" id="b-channel-btn" checked="checked">
+                </div>
                 <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
-                    <button id="undo-btn" class="material-symbols-outlined">undo</button>
-                    <button id="redo-btn" class="material-symbols-outlined">redo</button>
+                    <button id="channels-cancel">Cancel</button>
+                    <button id="channels-confirm">Confirm</button>
                 </div>
-                <button id="reset-btn">Reset</button>
-                <button id="invert-btn">Invert</button>
-                <button id="grayscale-btn">Grayscale</button>
-                <button id="boxblur-btn">Box blur</button>
-                <button id="gaussianblur-btn">Gaussian blur</button>
-                <button id="sobel-edge-btn">Sobel edge detection</button>
-                <button id="laplace-edge-btn">Laplace edge detection</button>
-                
-                <button id="sharpen-btn">Sharpen</button>
-                <button id="unsharpen-btn">Unsharpen</button>
-
-                <hr>
-                <label>Color channels</label>
-                <div id="color-channels">
-                    <div>
-                        <label for="r-channel-slider">R</label>
-                        <input type="range" name="r-channel-slider" id="r-channel-slider" min="0" max="2" value="1" step="0.1">
-                        <input type="checkbox" name="r-channel-btn" id="r-channel-btn" checked="checked">
-                    </div>
-                    <div>
-                        <label for="g-channel-slider">G</label>
-                        <input type="range" name="g-channel-slider" id="g-channel-slider" min="0" max="2" value="1" step="0.1">
-                        <input type="checkbox" name="g-channel-btn" id="g-channel-btn" checked="checked">
-                    </div>
-                    <div>
-                        <label for="b-channel-slider">B</label>
-                        <input type="range" name="b-channel-slider" id="b-channel-slider" min="0" max="2" value="1" step="0.1">
-                        <input type="checkbox" name="b-channel-btn" id="b-channel-btn" checked="checked">
-                    </div>
-                    <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
-                        <button id="channels-cancel">Cancel</button>
-                        <button id="channels-confirm">Confirm</button>
-                    </div>
-                </div>
-                <hr>
-
-                <label for="brightness-slider">Brightness</label>
-                <input type="range" id="brightness-slider" name="brightness-slider" min="-100" max="100" value="0" step="1">
-
-                <label for="brightness-slider">Tresholding</label>
-                <input type="range" id="tresholding-slider" name="tresholding-slider" min="1" max="254" value="128" step="1">
             </div>
-            <div id="canvas-container">
-                <canvas id="canvas"></canvas>
-            </div>
+            <hr>
+
+            <label for="brightness-slider">Brightness</label>
+            <input type="range" id="brightness-slider" name="brightness-slider" min="-100" max="100" value="0" step="1">
+
+            <label for="brightness-slider">Tresholding</label>
+            <input type="range" id="tresholding-slider" name="tresholding-slider" min="1" max="254" value="128" step="1">
+
+            <hr>
+            <button id="toggle-histogram-btn">Toggle histogram</button>
         </div>
+        <div id="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
 
-
+    <div id="histogram-container" class="hidden">
+        <canvas id="histogram"></canvas>
+    </div>
     
     <script src="js/filters.js"></script>
+    <script src="js/histogram.js"></script>
     <script src="js/main.js"></script>
     <script src="js/canvas.js"></script>
     <script src="js/ui.js"></script>
