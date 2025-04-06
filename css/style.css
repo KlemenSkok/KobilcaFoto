@@ -69,17 +69,17 @@ body {
     padding: 10px 10px;
     cursor: pointer;
     font-size: 14px;
-    margin: 0 25px;
+    margin: 0 35px;
     border-radius: 5px;
-    user-select: none;
-}
-
-#toolbar label {
     user-select: none;
 }
 
 #toolbar button:hover {
     background-color: #666;
+}
+
+#toolbar label {
+    user-select: none;
 }
 
 #toolbar hr {

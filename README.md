@@ -17,9 +17,9 @@
 
 ### Dodatne zahteve
 - [x] undo/redo
-- [ ] možnost spreminjanja le enega dele slike
+- [x] možnost spreminjanja le enega dele slike
 - [ ] popoln nadzor nad jedrom (nastavljanje velikosti, tipa in števil v jedru)
-- [ ] čopič za risanje po fotografiji
+- [x] čopič za risanje po fotografiji
 - [ ] pametno brisanje objektov
 
 
