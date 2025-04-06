@@ -281,3 +281,8 @@ document.getElementById("undo-btn").addEventListener("click", () => {
 document.getElementById("redo-btn").addEventListener("click", () => {
     redo();
 });
+
+// show or hide the histogram
+document.getElementById("toggle-histogram-btn").addEventListener("click", () => {
+    document.getElementById("histogram-container").classList.toggle("hidden");
+});
