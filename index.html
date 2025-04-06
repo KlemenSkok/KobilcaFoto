@@ -35,24 +35,30 @@
                 <button id="sharpen-btn">Sharpen</button>
                 <button id="unsharpen-btn">Unsharpen</button>
 
+                <hr>
+                <label>Color channels</label>
                 <div id="color-channels">
                     <div>
                         <label for="r-channel-slider">R</label>
-                        <input type="range" name="r-channel-slider" id="r-channel-slider" min="0" max="2" value="1" step="0.01">
+                        <input type="range" name="r-channel-slider" id="r-channel-slider" min="0" max="2" value="1" step="0.1">
                         <input type="checkbox" name="r-channel-btn" id="r-channel-btn" checked="checked">
                     </div>
                     <div>
                         <label for="g-channel-slider">G</label>
-                        <input type="range" name="g-channel-slider" id="g-channel-slider" min="0" max="2" value="1" step="0.01">
+                        <input type="range" name="g-channel-slider" id="g-channel-slider" min="0" max="2" value="1" step="0.1">
                         <input type="checkbox" name="g-channel-btn" id="g-channel-btn" checked="checked">
                     </div>
                     <div>
                         <label for="b-channel-slider">B</label>
-                        <input type="range" name="b-channel-slider" id="b-channel-slider" min="0" max="2" value="1" step="0.01">
+                        <input type="range" name="b-channel-slider" id="b-channel-slider" min="0" max="2" value="1" step="0.1">
                         <input type="checkbox" name="b-channel-btn" id="b-channel-btn" checked="checked">
                     </div>
-
+                    <div style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;">
+                        <button id="channels-cancel">Cancel</button>
+                        <button id="channels-confirm">Confirm</button>
+                    </div>
                 </div>
+                <hr>
 
                 <label for="brightness-slider">Brightness</label>
                 <input type="range" id="brightness-slider" name="brightness-slider" min="-100" max="100" value="0" step="1">

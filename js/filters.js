@@ -321,15 +321,16 @@ function unsharpMask(imageData, blurRadius = 1, amount = 1.0) {
 
 
 // color channel manipulation
-function alterColorChannels(imageData, r = 1, g = 1, b = 1) {
-    const data = copyImageData(imageData);
+function alterColorChannels(data, r = 1, g = 1, b = 1) {
+    //const data = copyImageData(imageData);
     const pixels = data.data;
 
-    for(let i = 0; i < pixels.size; i += 4) {
-        pixels[i]       *= r; // Red
-        pixels[i + 1]   *= g; // Green
-        pixels[i + 2]   *= b; // Blue
+    for(let i = 0; i < pixels.length; i += 4) {
+        pixels[i]     = clamp_Uint8(pixels[i]     * r); // Red
+        pixels[i + 1] = clamp_Uint8(pixels[i + 1] * g); // Green
+        pixels[i + 2] = clamp_Uint8(pixels[i + 2] * b); // Blue
     }
 
+    console.log(`r: ${r}, g: ${g}, b: ${b}`);
     return data;
 }

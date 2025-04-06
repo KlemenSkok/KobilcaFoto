@@ -66,13 +66,27 @@ body {
     color: white;
     background-color: #555;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 10px;
     cursor: pointer;
-    font-size: 16px;
-    margin: 0 10px;
+    font-size: 14px;
+    margin: 0 25px;
     border-radius: 5px;
 }
 
+#toolbar button:hover {
+    background-color: #666;
+}
+
+#toolbar hr {
+    border: 1px solid #555;
+    margin: 10px 0;
+}
+
+#color-channels {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 #canvas-container {
     display: flex;

@@ -29,6 +29,17 @@ function uploadImage(e) {
     reader.readAsDataURL(e.target.files[0]);
 }
 
+// UTILITY FUNCTIONS
+
+function updateColorChannels() {
+    const r_channel = document.getElementById("r-channel-slider").value;
+    const g_channel = document.getElementById("g-channel-slider").value;
+    const b_channel = document.getElementById("b-channel-slider").value;
+
+    const newImageData = alterColorChannels(getLastSave(), r_channel, g_channel, b_channel);
+    ctx.putImageData(newImageData, 0, 0);
+}
+
 
 // UI ELEMENTS
 
@@ -179,87 +190,87 @@ document.getElementById("download-btn").addEventListener("click", () => {
 // R
 document.getElementById("r-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, r = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
 
-    // AND save the image
-    setLastSave(newImageData);
 });
 document.getElementById("r-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, r = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
+
 });
 document.getElementById("r-channel-btn").addEventListener("click", () => {
     // apply the filter
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, r = 0);
-    ctx.putImageData(newImageData, 0, 0);
+    document.getElementById("r-channel-slider").value = document.getElementById("r-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
+    updateColorChannels();
 
-    // AND save the image
-    setLastSave(newImageData);
-})
+});
 
 // G
 document.getElementById("g-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, g = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
 
-    // AND save the image
-    setLastSave(newImageData);
 });
 document.getElementById("g-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, g = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
+
 });
 document.getElementById("g-channel-btn").addEventListener("click", () => {
     // apply the filter
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, g = 0);
-    ctx.putImageData(newImageData, 0, 0);
+    document.getElementById("g-channel-slider").value = document.getElementById("g-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
+    updateColorChannels();
 
-    // AND save the image
-    setLastSave(newImageData);
-})
+});
 
 // B
 document.getElementById("b-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, b = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
 
-    // AND save the image
-    setLastSave(newImageData);
 });
 document.getElementById("b-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    let value = event.target.value;
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, b = value);
-    ctx.putImageData(newImageData, 0, 0);
+    updateColorChannels();
+
 });
 document.getElementById("b-channel-btn").addEventListener("click", () => {
     // apply the filter
-    const imageData = getLastSave();
-    const newImageData = alterColorChannels(imageData, b = 0);
-    ctx.putImageData(newImageData, 0, 0);
+    document.getElementById("b-channel-slider").value = document.getElementById("b-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
+    updateColorChannels();
+
+});
+
+
+document.getElementById("channels-confirm").addEventListener("click", () => {
+    // apply the filter
+    updateColorChannels();
 
     // AND save the image
-    setLastSave(newImageData);
-})
+    setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    
+    // reset sliders
+    document.getElementById("r-channel-slider").value = 1;
+    document.getElementById("g-channel-slider").value = 1;
+    document.getElementById("b-channel-slider").value = 1;
+    document.getElementById("r-channel-btn").checked = true;
+    document.getElementById("g-channel-btn").checked = true;
+    document.getElementById("b-channel-btn").checked = true;
+});
 
+document.getElementById("channels-cancel").addEventListener("click", () => {
+    // apply the filter
+    const imageData = getLastSave();
+    ctx.putImageData(imageData, 0, 0);
+
+    // reset sliders
+    document.getElementById("r-channel-slider").value = 1;
+    document.getElementById("g-channel-slider").value = 1;
+    document.getElementById("b-channel-slider").value = 1;
+    document.getElementById("r-channel-btn").checked = true;
+    document.getElementById("g-channel-btn").checked = true;
+    document.getElementById("b-channel-btn").checked = true;
+});
 
 
 // undo/redo buttons
