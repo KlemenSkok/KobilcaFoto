@@ -38,6 +38,10 @@ imageLoader.addEventListener('change', uploadImage, false);
 
 function uploadImage(e) {
 
+    selectionBox = null; // reset selection box
+    isSelecting = false; // reset selection state
+    drawSelectionBox(); // redraw the selection box
+
     var reader = new FileReader();
     reader.onload = function(event) {
         var img = new Image();
@@ -64,18 +68,41 @@ function updateColorChannels() {
     const g_channel = document.getElementById("g-channel-slider").value;
     const b_channel = document.getElementById("b-channel-slider").value;
 
-    const newImageData = alterColorChannels(getLastSave(), r_channel, g_channel, b_channel);
+    const newImageData = alterColorChannels(getLastSave(), r_channel, g_channel, b_channel, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
+    
+    return newImageData;
 }
 
-function drawSelectionBox() {
+function drawSelectionBox(imageData = null) {
+
+    if(imageData)
+        ctx.putImageData(imageData, 0, 0); // clear the canvas and redraw the image
+    else 
+        ctx.putImageData(getLastSave(), 0, 0); // clear the canvas and redraw the image
+
     if(selectionBox) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(selectionBox.x, selectionBox.y, selectionBox.width, selectionBox.height);
+        ctx.save();
+        ctx.setLineDash([5, 10]);
         
-        ctx.strokeStyle = currentBrushColor;
-        ctx.lineWidth = currentBrushSize;
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(
+            selectionBox.x, 
+            selectionBox.y, 
+            selectionBox.width, 
+            selectionBox.height
+        );
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            selectionBox.x, 
+            selectionBox.y, 
+            selectionBox.width, 
+            selectionBox.height
+        );
+        
+        ctx.restore();
     }
 }
 
@@ -85,21 +112,23 @@ function drawSelectionBox() {
 // grayscale filter
 document.getElementById("grayscale-btn").addEventListener("click", () => {
     const imageData = getLastSave();
-    const newImageData = grayscale(imageData);
+    const newImageData = grayscale(imageData, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 // invert image filter
 document.getElementById("invert-btn").addEventListener("click", () => {
     const imageData = getLastSave();
-    const newImageData = invert(imageData);
+    const newImageData = invert(imageData, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 // reset canvas to initial state
@@ -114,21 +143,23 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 // box blur filter
 document.getElementById("boxblur-btn").addEventListener("click", () => {
     const imageData = getLastSave();
-    const newImageData = boxBlur(imageData, 20);
+    const newImageData = boxBlur(imageData, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 // gaussian blur filter
 document.getElementById("gaussianblur-btn").addEventListener("click", () => {
     const imageData = getLastSave();
-    const newImageData = gaussianBlur(imageData);
+    const newImageData = gaussianBlur(imageData, 3, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 // sobel filter
@@ -178,19 +209,21 @@ document.getElementById("brightness-slider").addEventListener("mouseup", (event)
     // apply the filter
     let value = event.target.value / 2;
     const imageData = getLastSave();
-    const newImageData = brightness(imageData, value);
+    const newImageData = brightness(imageData, value, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // AND save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 document.getElementById("brightness-slider").addEventListener("input", (event) => {
     // apply the filter
     let value = event.target.value * 0.75;
     const imageData = getLastSave();
-    const newImageData = brightness(imageData, value);
+    const newImageData = brightness(imageData, value, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
+    drawSelectionBox(newImageData); // redraw the selection box
 });
 
 
@@ -199,11 +232,12 @@ document.getElementById("tresholding-slider").addEventListener("mouseup", (event
     // apply the filter
     let value = event.target.value;
     const imageData = getLastSave();
-    const newImageData = tresholding(imageData, value);
+    const newImageData = tresholding(imageData, value, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
     
     // AND save the image
     setLastSave(newImageData);
+    drawSelectionBox(); // redraw the selection box
 });
 
 
@@ -211,8 +245,9 @@ document.getElementById("tresholding-slider").addEventListener("input", (event) 
     // apply the filter
     let value = event.target.value;
     const imageData = getLastSave();
-    const newImageData = tresholding(imageData, value);
+    const newImageData = tresholding(imageData, value, selectionBox);
     ctx.putImageData(newImageData, 0, 0);
+    drawSelectionBox(newImageData); // redraw the selection box
 });
 
 
@@ -229,64 +264,65 @@ document.getElementById("download-btn").addEventListener("click", () => {
 // R
 document.getElementById("r-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("r-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("r-channel-btn").addEventListener("click", () => {
     // apply the filter
     document.getElementById("r-channel-slider").value = document.getElementById("r-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 
 // G
 document.getElementById("g-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("g-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("g-channel-btn").addEventListener("click", () => {
     // apply the filter
     document.getElementById("g-channel-slider").value = document.getElementById("g-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 
 // B
 document.getElementById("b-channel-slider").addEventListener("mouseup", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("b-channel-slider").addEventListener("input", (event) => {
     // apply the filter
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 document.getElementById("b-channel-btn").addEventListener("click", () => {
     // apply the filter
     document.getElementById("b-channel-slider").value = document.getElementById("b-channel-slider").value == 0 ? 1 : 0; // toggle between 0 and 1
-    updateColorChannels();
-
+    const result = updateColorChannels();
+    drawSelectionBox(result); // redraw the selection box
 });
 
 
 document.getElementById("channels-confirm").addEventListener("click", () => {
     // apply the filter
-    updateColorChannels();
+    const result = updateColorChannels();
 
     // AND save the image
-    setLastSave(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    setLastSave(result);
+    drawSelectionBox(); // redraw the selection box
     
     // reset sliders
     document.getElementById("r-channel-slider").value = 1;
@@ -301,6 +337,7 @@ document.getElementById("channels-cancel").addEventListener("click", () => {
     // apply the filter
     const imageData = getLastSave();
     ctx.putImageData(imageData, 0, 0);
+    drawSelectionBox(); // redraw the selection box
 
     // reset sliders
     document.getElementById("r-channel-slider").value = 1;
@@ -504,16 +541,18 @@ canvas.addEventListener("mouseup", (event) => {
         const y = event.clientY - rect.top;
         
         selectionBox = {
-            x: Math.min(selectionStartX, x),
-            y: Math.min(selectionStartY, y),
-            width: Math.abs(selectionStartX - x),
-            height: Math.abs(selectionStartY - y)
+            x: Math.floor(Math.min(selectionStartX, x)),
+            y: Math.floor(Math.min(selectionStartY, y)),
+            width: Math.floor(Math.abs(selectionStartX - x)),
+            height: Math.floor(Math.abs(selectionStartY - y))
         };
 
         if(selectionBox.width == 0 || selectionBox.height == 0) {
             // enable cancelling the selection
             selectionBox = null;
         }
+
+        drawSelectionBox();
     }
 });
 
@@ -545,14 +584,14 @@ canvas.addEventListener("mousemove", (event) => {
         const y = event.clientY - rect.top;
         
         selectionBox = {
-            x: Math.min(selectionStartX, x),
-            y: Math.min(selectionStartY, y),
-            width: Math.abs(selectionStartX - x),
-            height: Math.abs(selectionStartY - y)
+            x: Math.floor(Math.min(selectionStartX, x)),
+            y: Math.floor(Math.min(selectionStartY, y)),
+            width: Math.floor(Math.abs(selectionStartX - x)),
+            height: Math.floor(Math.abs(selectionStartY - y))
         };
 
         // draw the thing
-
+        drawSelectionBox();
     }
 });
 
@@ -564,4 +603,5 @@ document.getElementById("mode-selection").addEventListener("input", (event) => {
     // reset selection
     selectionBox = null;
     isSelecting = false;
+    drawSelectionBox();
 });

@@ -18,12 +18,25 @@ function copyImageData(imageData) {
     );
 }
 
-function toGrayscale(imageData) {
+function toGrayscale(imageData, boundingBox = null) {
     const pixels = imageData.data;
-    for (let i = 0; i < pixels.length; i += 4) {
-        const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
-        pixels[i] = pixels[i + 1] = pixels[i + 2] = avg;
+
+    const startX = boundingBox?.x || 0;
+    const startY = boundingBox?.y || 0;
+    const endX = boundingBox?.x + boundingBox?.width || imageData.width;
+    const endY = boundingBox?.y + boundingBox?.height || imageData.height;
+
+    for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+            const i = (y * imageData.width + x) * 4;
+
+            const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+            pixels[i] = avg;
+            pixels[i + 1] = avg;
+            pixels[i + 2] = avg;
+        }
     }
+
     return imageData;
 }
 
@@ -63,90 +76,177 @@ function applyConvolution(imageData, kernel, kernelWeight = 1) {
     return new ImageData(dst, width, height);
 }
 
+function cropImageData(imageData, x, y, width, height) {
+    const cropped = new ImageData(width, height);
+    const src = imageData.data;
+    const dst = cropped.data;
+    const imgWidth = imageData.width;
+
+    for (let row = 0; row < height; row++) {
+        for (let col = 0; col < width; col++) {
+            const srcIdx = ((y + row) * imgWidth + (x + col)) * 4;
+            const dstIdx = (row * width + col) * 4;
+            dst.set(src.slice(srcIdx, srcIdx + 4), dstIdx);
+        }
+    }
+
+    return cropped;
+}
+
+function pasteImageData(targetImageData, insertImageData, x, y) {
+    const src = insertImageData.data;
+    const dst = targetImageData.data;
+    const targetWidth = targetImageData.width;
+    const insertWidth = insertImageData.width;
+    const insertHeight = insertImageData.height;
+
+    for (let row = 0; row < insertHeight; row++) {
+        for (let col = 0; col < insertWidth; col++) {
+            const dstIdx = ((y + row) * targetWidth + (x + col)) * 4;
+            const srcIdx = (row * insertWidth + col) * 4;
+            dst.set(src.slice(srcIdx, srcIdx + 4), dstIdx);
+        }
+    }
+}
+
+
 
 // FILTERS
 
-function grayscale(imageData) {
+function grayscale(imageData, boundingBox = null) {
+
     const data = copyImageData(imageData);
-    toGrayscale(data);
+    toGrayscale(data, boundingBox);
 
     return data;
 }
 
-function brightness(imageData, value) {
-    const data = copyImageData(imageData);
-    const pixels = data.data;
-
-    for(let i = 0; i < pixels.length; i += 4) {
-        pixels[i] = clamp_Uint8(pixels[i] + value);          // Red
-        pixels[i + 1] = clamp_Uint8(pixels[i + 1] + value);  // Green
-        pixels[i + 2] = clamp_Uint8(pixels[i + 2] + value);  // Blue
-    }
-    return data;
-}
-
-function tresholding(imageData, treshold) {
-    const data = copyImageData(imageData);
-    const pixels = data.data;
-
-    for(let i = 0; i < pixels.length; i += 4) {
-        const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
-        if(avg > treshold) {
-            pixels[i] = 255;     // Red
-            pixels[i + 1] = 255; // Green
-            pixels[i + 2] = 255; // Blue
-        } else {
-            pixels[i] = 0;     // Red
-            pixels[i + 1] = 0; // Green
-            pixels[i + 2] = 0; // Blue
-        }
-    }
-    return data;
-}
-
-function invert(imageData) {
-    const data = copyImageData(imageData);
-    const pixels = data.data;
-
-    for(let i = 0; i < pixels.length; i += 4) {
-        pixels[i] = 255 - pixels[i];     // Red
-        pixels[i + 1] = 255 - pixels[i + 1]; // Green
-        pixels[i + 2] = 255 - pixels[i + 2]; // Blue
-    }
-    return data;
-}
-
-
-function boxBlur(imageData) {
+function brightness(imageData, value, boundingBox = null) {
     const data = copyImageData(imageData);
     const pixels = data.data;
     const width = imageData.width;
     const height = imageData.height;
 
-    const blurKernel = [
+    const startX = boundingBox?.x || 0;
+    const startY = boundingBox?.y || 0;
+    const endX = (boundingBox?.x + boundingBox?.width) || width;
+    const endY = (boundingBox?.y + boundingBox?.height) || height;
+
+    for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+            const i = (y * width + x) * 4;
+            pixels[i]     = clamp_Uint8(pixels[i]     + value);
+            pixels[i + 1] = clamp_Uint8(pixels[i + 1] + value);
+            pixels[i + 2] = clamp_Uint8(pixels[i + 2] + value);
+        }
+    }
+
+    return data;
+}
+
+function tresholding(imageData, threshold, boundingBox = null) {
+    const data = copyImageData(imageData);
+    const pixels = data.data;
+    const width = imageData.width;
+    const height = imageData.height;
+
+    const startX = boundingBox?.x || 0;
+    const startY = boundingBox?.y || 0;
+    const endX = (boundingBox?.x + boundingBox?.width) || width;
+    const endY = (boundingBox?.y + boundingBox?.height) || height;
+
+    for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+            const i = (y * width + x) * 4;
+            const avg = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+            const val = avg > threshold ? 255 : 0;
+            pixels[i]     = val;
+            pixels[i + 1] = val;
+            pixels[i + 2] = val;
+        }
+    }
+
+    return data;
+}
+
+function invert(imageData, boundingBox = null) {
+    const data = copyImageData(imageData);
+    const pixels = data.data;
+    const width = imageData.width;
+    const height = imageData.height;
+
+    const startX = boundingBox?.x || 0;
+    const startY = boundingBox?.y || 0;
+    const endX = (boundingBox?.x + boundingBox?.width) || width;
+    const endY = (boundingBox?.y + boundingBox?.height) || height;
+
+    for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+            const i = (y * width + x) * 4;
+            pixels[i]     = 255 - pixels[i];
+            pixels[i + 1] = 255 - pixels[i + 1];
+            pixels[i + 2] = 255 - pixels[i + 2];
+        }
+    }
+
+    return data;
+}
+
+function boxBlur(imageData, boundingBox = null) {
+    if (!boundingBox) {
+        return fullBoxBlur(imageData);
+    }
+
+    const data = copyImageData(imageData);
+    const { x, y, width, height } = boundingBox;
+
+    const cropped = cropImageData(data, x, y, width, height);
+    const blurred = fullBoxBlur(cropped);
+
+    pasteImageData(data, blurred, x, y);
+    return data;
+}
+
+// when we dont have a bounding box (blur the entire image)
+function fullBoxBlur(imageData) {
+    const kernel = [
         [1, 1, 1],
         [1, 1, 1],
         [1, 1, 1]
     ];
-    const blurred = applyConvolution(data, blurKernel, 9); // 3x3 kernel, sum = 9
-    
-    return blurred;
+    const weight = 9;
+
+    return applyConvolution(imageData, kernel, weight);
 }
 
-function gaussianBlur(imageData, radius = 3) {
-    const sigma = radius / 2; // or any custom value (radius / 3 is also common)
+function gaussianBlur(imageData, radius = 3, boundingBox = null) {
+    if (!boundingBox) {
+        return fullGaussianBlur(imageData, radius);
+    }
+
+    const data = copyImageData(imageData);
+    const { x, y, width, height } = boundingBox;
+
+    const cropped = cropImageData(data, x, y, width, height);
+    const blurred = fullGaussianBlur(cropped, radius);
+
+    pasteImageData(data, blurred, x, y);
+    return data;
+}
+
+// when we dont have a bounding box (blur the entire image)
+function fullGaussianBlur(imageData, radius = 3) {
+    const sigma = radius / 2;
     const kernelSize = radius * 2 + 1;
     const kernel = [];
     let kernelSum = 0;
 
-    // Generate 1D Gaussian kernel
     for (let i = -radius; i <= radius; i++) {
         const value = Math.exp(-(i * i) / (2 * sigma * sigma));
         kernel.push(value);
         kernelSum += value;
     }
 
-    // Normalize the kernel
     for (let i = 0; i < kernel.length; i++) {
         kernel[i] /= kernelSum;
     }
@@ -157,18 +257,18 @@ function gaussianBlur(imageData, radius = 3) {
     const tmp = new Uint8ClampedArray(src.length);
     const dst = new Uint8ClampedArray(src.length);
 
-    // Horizontal blur
+    // Horizontal
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             let r = 0, g = 0, b = 0, a = 0;
             for (let k = -radius; k <= radius; k++) {
                 const px = clampIndex(x + k, 0, width - 1);
                 const idx = (y * width + px) * 4;
-                const weight = kernel[k + radius];
-                r += src[idx] * weight;
-                g += src[idx + 1] * weight;
-                b += src[idx + 2] * weight;
-                a += src[idx + 3] * weight;
+                const w = kernel[k + radius];
+                r += src[idx] * w;
+                g += src[idx + 1] * w;
+                b += src[idx + 2] * w;
+                a += src[idx + 3] * w;
             }
             const idx = (y * width + x) * 4;
             tmp[idx] = r;
@@ -178,18 +278,18 @@ function gaussianBlur(imageData, radius = 3) {
         }
     }
 
-    // Vertical blur
+    // Vertical
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             let r = 0, g = 0, b = 0, a = 0;
             for (let k = -radius; k <= radius; k++) {
                 const py = clampIndex(y + k, 0, height - 1);
                 const idx = (py * width + x) * 4;
-                const weight = kernel[k + radius];
-                r += tmp[idx] * weight;
-                g += tmp[idx + 1] * weight;
-                b += tmp[idx + 2] * weight;
-                a += tmp[idx + 3] * weight;
+                const w = kernel[k + radius];
+                r += tmp[idx] * w;
+                g += tmp[idx + 1] * w;
+                b += tmp[idx + 2] * w;
+                a += tmp[idx + 3] * w;
             }
             const idx = (y * width + x) * 4;
             dst[idx] = r;
@@ -321,16 +421,25 @@ function unsharpMask(imageData, blurRadius = 1, amount = 1.0) {
 
 
 // color channel manipulation
-function alterColorChannels(data, r = 1, g = 1, b = 1) {
-    //const data = copyImageData(imageData);
+function alterColorChannels(imageData, r = 1, g = 1, b = 1, boundingBox = null) {
+    const data = copyImageData(imageData);
     const pixels = data.data;
+    const width = imageData.width;
+    const height = imageData.height;
 
-    for(let i = 0; i < pixels.length; i += 4) {
-        pixels[i]     = clamp_Uint8(pixels[i]     * r); // Red
-        pixels[i + 1] = clamp_Uint8(pixels[i + 1] * g); // Green
-        pixels[i + 2] = clamp_Uint8(pixels[i + 2] * b); // Blue
+    const startX = boundingBox?.x || 0;
+    const startY = boundingBox?.y || 0;
+    const endX = (boundingBox?.x + boundingBox?.width) || width;
+    const endY = (boundingBox?.y + boundingBox?.height) || height;
+
+    for (let y = startY; y < endY; y++) {
+        for (let x = startX; x < endX; x++) {
+            const i = (y * width + x) * 4;
+            pixels[i]     = clamp_Uint8(pixels[i]     * r);
+            pixels[i + 1] = clamp_Uint8(pixels[i + 1] * g);
+            pixels[i + 2] = clamp_Uint8(pixels[i + 2] * b);
+        }
     }
 
-    //console.log(`r: ${r}, g: ${g}, b: ${b}`);
     return data;
 }

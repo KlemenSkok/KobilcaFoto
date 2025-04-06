@@ -21,3 +21,8 @@
 - [ ] popoln nadzor nad jedrom (nastavljanje velikosti, tipa in števil v jedru)
 - [ ] čopič za risanje po fotografiji
 - [ ] pametno brisanje objektov
+
+
+<hr>
+
+Stran je na voljo na [Githubu](https://github.com/KlemenSkok/KobilcaFoto)
