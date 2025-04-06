@@ -24,7 +24,11 @@ ctx.lineCap = "round";
 ctx.strokeStyle = currentBrushColor;
 
 
+// PRELOADER
 
+window.addEventListener("load", () => {
+    document.getElementById("preloader").style.display = "none";
+});
 
 
 // UPLOAD IMAGES
